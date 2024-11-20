@@ -1,0 +1,23 @@
+<h2>Customer List</h2>
+<table class="customer-table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Company Name</th>
+      <th>Company Size</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let customer of customers">
+      <td>{{ customer.id }}</td>
+      <td>{{ customer.companyName }}</td>
+      <td>{{ customer.companySize }}</td>
+      <td>
+        <button class="action-button delete" (click)="deleteCustomer(customer.id)">Delete</button>
+        <a class="action-button edit" [routerLink]="['/edit', customer.id]">Edit</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<a class="add-button" routerLink="/add">Add Customer</a>

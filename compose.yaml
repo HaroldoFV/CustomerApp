@@ -1,0 +1,55 @@
+﻿networks:
+  customer_network:
+    driver: bridge
+
+services:
+  customer.api:
+    image: customer.api
+    container_name: customer_api
+    build:
+      context: .
+      dockerfile: src/Customer.API/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - customer.db
+    networks:
+      - customer_network
+
+  customer.db:
+    image: postgres
+    container_name: customer_db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=customer_db
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=M01D15X137
+    volumes:
+      - ./src/sql:/docker-entrypoint-initdb.d/:ro
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - customer_network
+    restart: always
+    tty: true
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U root -d customer_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  frontend:
+    container_name: frontend
+    build: frontend/.
+    ports:
+      - "4200:80"
+    depends_on:
+      - customer.api
+    networks:
+      - customer_network
+    restart: always
+
+volumes:
+  postgres_data:
